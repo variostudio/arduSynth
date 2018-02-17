@@ -98,7 +98,7 @@ Simple!
 
 I can recommend to use [Audacity](https://www.audacityteam.org/) to show your waveforms coming from Pro Mini.
 There is my sampes:
-* ![Sine wave](https://github.com/variostudio/arduSynth/blob/master/images/wave1.png)
-* ![Ramp wave](https://github.com/variostudio/arduSynth/blob/master/images/wave2.png)
-* ![Triangle wave](https://github.com/variostudio/arduSynth/blob/master/images/wave2.png)
+![Sine wave](https://github.com/variostudio/arduSynth/blob/master/images/wave1.png)
+![Ramp wave](https://github.com/variostudio/arduSynth/blob/master/images/wave2.png)
+![Triangle wave](https://github.com/variostudio/arduSynth/blob/master/images/wave2.png)
 All those outputs are produced by **listing2**
