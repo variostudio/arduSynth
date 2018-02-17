@@ -13,9 +13,9 @@ My special thanks to
 ## Chapter 1. Generating sounds with Arduino
 For the beginning I strongly recommend take a look onto great article [Advanced Arduino Sound Synthesis](https://makezine.com/projects/make-35/advanced-arduino-sound-synthesis/) 
 I would put the original code here with some adoptions.
-So, it the **chapter1** folder two samples could be found - the original **listning2** from Jon Thompson article and my adoption for Arduino Pro Mini 3v 8MHz.  
+So, it the **chapter1** folder two samples could be found - the original **listing2** from Jon Thompson article and my adoption for Arduino Pro Mini 3v 8MHz.  
 
-Why Pro Mini 3v 8MHz?
+### Why Pro Mini 3v 8MHz?
 
 Because it is:
 * cheap
@@ -23,6 +23,7 @@ Because it is:
 The Pro Mini board 3.3v version takes about 5 mA instead of 5V version (about 20mA)
 [Arduino Low Power](http://www.home-automation-community.com/arduino-low-power-how-to-run-atmega328p-for-a-year-on-coin-cell-battery/)
 
+### Software is more importrant to hardware
 But small code correction should be made because it runs at 8Mhz instead of 16 Mhz
 So, we need to tweak timer a bit. Original code working at 16Mhz was:
 
@@ -43,9 +44,6 @@ void setup() {
   TIMSK2 = (1 << OCIE2A);   // Set timer to call ISR when TCNT2 = OCRA2
   OCR2A = 32;               // sets the frequency of the generated wave
   sei();                    // Enable interrupts to generate waveform!
-}
-
-void loop() {  // Nothing to do!
 }
 ```
 This is prescaler setting
@@ -89,3 +87,18 @@ void setup() {
 ```
 
 There is all differences with 5v and 3.3v versions.
+
+### Debugging the code
+Th very critical problem for me was how to debug the code? It nerev be a problem if you have osciloscope.
+But I haven't.
+So, I'd decided to use soundcard of my computer to get the output of Arduino.
+Connecting it pretty simple. Take a 3.5 audio jack cable and connect ground pin of jack to Arduino ground.
+The connect left and right pins of jack together and via 10KOm resistor to pin 9 of Arduino.
+Simple!
+
+I can recommend to use [Audacity](https://www.audacityteam.org/) to show your waveforms coming from Pro Mini.
+There is my sampes:
+* ![Sine wave](https://github.com/variostudio/arduSynth/blob/master/images/wave1.png)
+* ![Ramp wave](https://github.com/variostudio/arduSynth/blob/master/images/wave2.png)
+* ![Triangle wave](https://github.com/variostudio/arduSynth/blob/master/images/wave2.png)
+All those outputs are produced by **listing2**
