@@ -46,7 +46,8 @@ void setup() {
 }
 
 void loop() {  // Nothing to do!
-}```
+}
+```
 This is prescaler setting
 `TCCR2B = (1 << CS21);     // Set prescaller to divide by 8` 
 makes timer works at 1/8 of original clock speed (Actually 16/8 = 2Mhz)
@@ -84,6 +85,7 @@ void setup() {
   TIMSK2 = (1 << OCIE2A);   // Set timer to call ISR when TCNT2 = OCRA2
   OCR2A = 32*4;               // sets the frequency of the generated wave
   sei();                    // Enable interrupts to generate waveform!
-}```
+}
+```
 
 There is all differences with 5v and 3.3v versions.
