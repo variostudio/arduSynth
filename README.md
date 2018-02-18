@@ -4,7 +4,7 @@ This project is about generating good quality music with Arduino platform.
 It consist of small chapters describing project iteration step by step
 
 ## Getting Started
-The project is based on Arduino platform. Details could be found here [Arduino](https://www.arduino.cc/)
+The project is based on [Arduino](https://www.arduino.cc/) platform.
 
 My special thanks to
 * Jon Thompson and [Advanced Arduino Sound Synthesis](https://makezine.com/projects/make-35/advanced-arduino-sound-synthesis/) 
@@ -13,7 +13,7 @@ My special thanks to
 ## Chapter 1. Generating sounds with Arduino
 For the beginning I strongly recommend take a look onto great article [Advanced Arduino Sound Synthesis](https://makezine.com/projects/make-35/advanced-arduino-sound-synthesis/) 
 I would put the original code here with some adoptions.
-So, it the **chapter1** folder two samples could be found - the original **listing2** from Jon Thompson article and my adoption for Arduino Pro Mini 3v 8MHz.  
+So, it the **chapter1** folder two samples could be found - the original **listing2** from Jon Thompson article and my adoption for Arduino Pro Mini 3v 8MHz.
 
 ### Why Pro Mini 3v 8MHz?
 
@@ -102,3 +102,46 @@ There is my sampes:
 ![Ramp wave](https://github.com/variostudio/arduSynth/blob/master/images/wave2.png)
 ![Triangle wave](https://github.com/variostudio/arduSynth/blob/master/images/wave3.png)
 All those outputs are produced by **listing2**
+
+## Chapter 2. Play by Wire
+Now it is time to move forward and add one more Arduino to control note playing.
+Lets use [Arduino Wire](https://www.arduino.cc/en/Reference/Wire) to connect several Arduinos in one bus. 
+Big deal of this idea is connecting unlimited devices using only two Pro Mini pins - A4 and A5.
+In each bus we need to have at least on master board and one slave.
+So, master board will tell a slave one when and what note to play. Then slave device will start playing.
+In **chapter2** two programs could be found - **master.ino** and **wireNote.ino**
+The master are telling to his I2C partner what to play:
+```C
+#include <Wire.h>
+
+void setup() {
+  Wire.begin(); // join i2c bus (address optional for master)
+  randomSeed(analogRead(0));
+}
+
+void loop() {
+  Wire.beginTransmission(8); // transmit to device #8
+  Wire.write(random(17*4, 60*4));              // sends one byte
+  Wire.endTransmission();    // stop transmitting
+
+  delay(500);
+}
+```
+This code initialize communication and in the loop of 500ms sends command with note number to slave device registered on I2C address `8`
+
+Slave device register himself with address `8` and start listens to transmittion events.
+```C
+  Wire.begin(8);                // join i2c bus with address #8
+  Wire.onReceive(receiveEvent); // register event
+```
+When I2C event come, the method `receiveEvent` would be called
+```C
+void receiveEvent(int howMany) {
+  int code = Wire.read();    // receive byte as an integer
+
+  if (code > 0) {
+    initNote(code);
+  }
+}
+```
+This method initialize note playing.
