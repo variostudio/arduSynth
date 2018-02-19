@@ -1,6 +1,7 @@
 #include <Wire.h>
 /******** Load AVR timer interrupt macros ********/
 #include <avr/interrupt.h>
+#include "waveform.h"
 
 /******** Sine wave parameters ********/
 #define PI2     6.283185 // 2 * PI - saves calculating it later
@@ -17,7 +18,7 @@ int decayJ;
 boolean noteFinished = true;
 
 /******** Populate the waveform lookup table with a sine wave ********/
-void initNote(int code) {
+void initNote(int code, int form) {
   noteFinished = false;
   cli();
   decayI = 0;
@@ -25,17 +26,15 @@ void initNote(int code) {
   index = 0;
   OCR2A = code;             // sets the frequency of the generated wave
 
-  for (int i=0; i<LENGTH; i++) {
-    float v = (AMP*sin((PI2/LENGTH)*i));  // Calculate current entry
-    wave[i] = int(v+OFFSET);              // Store value as integer
-  }  
+  waveform(form);
+
   sei(); 
 }
 
 void setup() {  
-  Wire.begin(7);                // join i2c bus with address #8
+  Wire.begin(8);                // join i2c bus with address #8
   Wire.onReceive(receiveEvent); // register event
-  initNote(32*4);
+  initNote(32*4, SINE);
   
   /******** Set timer1 for 8-bit fast PWM output ********/
   pinMode(9, OUTPUT);       // Make timer's PWM pin an output
@@ -76,24 +75,67 @@ void decay() {
   if (decayI == LENGTH-1) {
     decayI = 0;
     decayJ++;
-    //delay(0);
-  } 
+    delay(2);
+  } else {
+    decayI++;  
+  }
   if (decayJ == 127) {
     decayJ = 0;
     //cli();
     noteFinished = true;
   }
-  
-  decayI++;
 }
   
 
 void receiveEvent(int howMany) {
   int code = Wire.read();    // receive byte as an integer
+  int form = Wire.read();
 
   if (code > 0) {
-    initNote(code);
+    initNote(code, form);
   }
 }
 
+void waveform(int w) {
+ switch(w) {
 
+   case SINE: 
+    for (int i=0; i<LENGTH; i++) 
+      {float v = OFFSET+(AMP*sin((PI2/LENGTH)*i));
+      wave[i]=int(v);
+    }
+    break;
+
+  case RAMP:
+    for (int i=0; i<LENGTH; i++) {
+      wave[i]=i;
+    }
+    break;
+
+  case TRIANGLE:
+    for (int i=0; i<LENGTH; i++) {
+      if (i<(LENGTH/2)) {
+        wave[i]=i*2;
+      } else {
+        wave[i]=(LENGTH-1)-(i*2);
+      }
+    }
+    break;
+    
+  case SQUARE:
+    for (int i=0; i<(LENGTH/2); i++) {
+      wave[i]=255;
+    }
+    for (int i=(LENGTH/2)+1; i<LENGTH; i++) {
+      wave[i]=0;
+    }    
+    break;
+
+  case RANDOM:
+    randomSeed(2);
+    for (int i=0; i<LENGTH; i++) {
+      wave[i]=random(255);
+    }
+    break;
+  }
+}
