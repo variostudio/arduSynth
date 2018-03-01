@@ -39,7 +39,7 @@ void setup() {
   TCCR2A = 0;
   TCCR2B = (1 << CS20);
   TIMSK2 = (1 << OCIE2A);
-  OCR2A = 32*4;
+  OCR2A = 89;
   sei();
 }
 
