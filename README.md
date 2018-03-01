@@ -81,7 +81,7 @@ void setup() {
   TCCR2A = 0;               // We need no options in control register A
   TCCR2B = (1 << CS20);     // Set prescaller to divide by 1
   TIMSK2 = (1 << OCIE2A);   // Set timer to call ISR when TCNT2 = OCRA2
-  OCR2A = 32*4;               // sets the frequency of the generated wave
+  OCR2A = 89;               // sets the frequency of the generated wave
   sei();                    // Enable interrupts to generate waveform!
 }
 ```
