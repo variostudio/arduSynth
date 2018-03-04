@@ -24,6 +24,7 @@ byte decayJ;
 byte state = 0;
 byte note_code = 40 * 4;
 byte note_form = 0;
+boolean highNote = false;
 
 /******** Populate the waveform lookup table with a sine wave ********/
 void initNote() {
@@ -39,7 +40,11 @@ void initNote() {
 
     /******** Set up timer 2 to call ISR ********/
     TCCR2A = 0;               // We need no options in control register A
-    TCCR2B = (1 << CS20);     // Set prescaller to divide by 1
+    if (highNote) {
+      TCCR2B = (1 << CS20);     // Set prescaller to divide by 1 - play high frequency notes
+    } else {
+      TCCR2B = (1 << CS21);     // Set prescaller to divide by 8 - play low frequency notes
+    }
     TIMSK2 = (1 << OCIE2A);   // Set timer to call ISR when TCNT2 = OCRA2
 
     OCR2A = note_code;             // sets the frequency of the generated wave
@@ -108,6 +113,8 @@ void receiveEvent(int howMany) {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       note_code = Wire.read();    // receive byte as an integer
       note_form = Wire.read();
+
+      highNote = (bitRead(note_form, 7) == 1);
 
       if (note_code > 0) {
         state = NEW_NOTE;
