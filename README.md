@@ -144,4 +144,4 @@ void receiveEvent(int howMany) {
   }
 }
 ```
-This method initialize note playing.
+This method initialize note playing
